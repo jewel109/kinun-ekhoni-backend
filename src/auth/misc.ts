@@ -1,6 +1,6 @@
 import * as bcrypt from 'bcrypt';
 
-export async function validatePassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
-  return await bcrypt.compare(plainPassword, hashedPassword);
+export function validatePassword(plainPassword: string, hashedPassword: string): Promise<boolean> {
+  return bcrypt.compare(plainPassword, hashedPassword);
 }
 
