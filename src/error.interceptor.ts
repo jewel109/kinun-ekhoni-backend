@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import { EntityNotFoundError, QueryFailedError, TypeORMError } from 'typeorm';
-
+import { TokenExpiredError, JsonWebTokenError, NotBeforeError } from '@nestjs/jwt'
 @Catch()
 export class CatchEverythingFilter implements ExceptionFilter {
   constructor(private readonly httpAdapterHost: HttpAdapterHost) { }
@@ -23,30 +23,53 @@ export class CatchEverythingFilter implements ExceptionFilter {
       timestamp: new Date().toISOString(),
     };
 
-    if (exception instanceof HttpException) {
-      httpStatus = exception.getStatus();
-      const response = exception.getResponse();
-      const message =
-        typeof response === 'object' && response !== null
-          ? (response as { message: string }).message
-          : 'Unknown error found';
-      responseBody.message = message;
-    } else if (exception instanceof QueryFailedError) {
-      httpStatus = HttpStatus.BAD_REQUEST;
-      responseBody.message = `Database query failed: ${exception.message}`;
-    } else if (exception instanceof EntityNotFoundError) {
-      httpStatus = HttpStatus.NOT_FOUND;
-      responseBody.message = `Entity not found: ${exception.message}`;
-    } else if (exception instanceof Error) {
-      httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-      responseBody.message = `${exception.message}`;
-    } else if (exception instanceof TypeORMError) {
-      httpStatus = HttpStatus.BAD_REQUEST;
-      responseBody.message = `Error in TypeOrm : ${exception.message}`;
-    } else {
-      console.error(exception);
-    }
+    switch (true) {
+      case exception instanceof HttpException: {
+        httpStatus = exception.getStatus();
+        const exResponse = exception.getResponse();
+        console.log(exResponse)
+        responseBody.message =
+          typeof exResponse === 'object' && exResponse !== null
+            ? (exResponse as { message: string }).message
+            : 'Unknown error found';
+        break;
+      }
 
+      case exception instanceof QueryFailedError: {
+        httpStatus = HttpStatus.BAD_REQUEST;
+        responseBody.message = `Database query failed: ${exception.message}`;
+        break;
+      }
+
+      case exception instanceof EntityNotFoundError: {
+        httpStatus = HttpStatus.NOT_FOUND;
+        responseBody.message = `Entity not found: ${exception.message}`;
+        break;
+      }
+
+      case exception instanceof TypeORMError: {
+        httpStatus = HttpStatus.BAD_REQUEST;
+        responseBody.message = `TypeORM error: ${exception.message}`;
+        break;
+      }
+
+      case exception instanceof JsonWebTokenError: {
+        httpStatus = HttpStatus.BAD_REQUEST
+        responseBody.message = `jwt error ${exception.message}`
+      }
+
+      case exception instanceof Error: {
+        httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
+        responseBody.message = exception.message;
+        console.log('Error instance')
+        break;
+      }
+
+      default: {
+        console.error('Unknown exception caught:', exception);
+        break;
+      }
+    }
     console.log(responseBody)
     httpAdapter.reply(ctx.getResponse(), responseBody, httpStatus);
   }
