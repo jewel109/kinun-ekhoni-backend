@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { APP_GUARD } from '@nestjs/core';
-import { JwtAuthGuard } from './auth/jwt-auth.gurd';
 import { AuthModule } from './auth/auth.module';
-import { UserModule } from './user/user.module';
-import { ConfigModule, ConfigService } from '@nestjs/config'
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { User } from './user/user.entity';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { JwtAuthGuard } from './auth/jwt-auth.gurd';
+import { RoleGuard } from './auth/role.gurd';
 import { SuccessInterceptor } from './success.interceptor';
+import { User } from './user/user.entity';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [AuthModule, UserModule,
@@ -38,6 +38,11 @@ import { SuccessInterceptor } from './success.interceptor';
       provide: APP_GUARD,
       useClass: JwtAuthGuard
     },
+    {
+      provide: APP_GUARD,
+      useClass: RoleGuard
+    },
+
     { provide: APP_INTERCEPTOR, useClass: SuccessInterceptor }
   ],
 })
