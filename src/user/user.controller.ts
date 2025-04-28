@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { User } from './user.entity';
 import { IResponse } from 'src/success.interceptor';
 import { AuthCredintialDto } from 'src/auth/authcredintialDto';
+import { Public } from 'src/utils/public.decorator';
 
 @Controller('user')
 export class UserController {
@@ -25,6 +26,12 @@ export class UserController {
     const { accessToken } = await this.userService.createUser(createUserDto);
 
     return { data: accessToken };
+  }
+
+  @Public()
+  @Get('users')
+  async getUsers(): Promise<IResponse<string>> {
+    return { data: "found users" }
   }
 
   // @Post('findUser')
