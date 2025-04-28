@@ -17,7 +17,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: AuthCredintialDto) {
     // console.log(payload)
-    return { email: payload.email, password: payload.password };
+    return { email: payload.email, password: payload.password, role: payload.role };
   }
 }
 
