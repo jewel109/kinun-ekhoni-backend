@@ -1,7 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NotFoundError } from 'rxjs';
 import { User } from 'src/user/user.entity';
 import { Repository } from 'typeorm';
 import { AuthCredintialDto } from './authcredintialDto';
@@ -21,12 +20,12 @@ export class AuthService {
 
     const user = await this.usersRepository.findOne({ where: { email: signInDto.email } })
     if (!user) {
-      throw new NotFoundError("User is not found with this email ")
+      throw new NotFoundException("User is not found with this email ")
     }
-    const matchedPass = await validatePassword(signInDto.password, user.password)
+    const matchedPass = validatePassword(signInDto.password, user.password)
 
     if (!matchedPass) {
-      throw new NotFoundError("Password is not mathced")
+      throw new NotFoundException("Password is not mathced")
     }
 
     return { accessToken: this.jwtService.sign(signInDto) }

@@ -1,9 +1,10 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Request } from '@nestjs/common';
 import { IResponse } from 'src/success.interceptor';
 import { UserService } from 'src/user/user.service';
-import { AuthCredintialDto } from './authcredintialDto';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './jwt-auth.gurd';
+import { AuthCredintialDto } from './authcredintialDto';
+import { Public } from 'src/utils/public.decorator';
+import { Policy } from './policy.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -12,6 +13,8 @@ export class AuthController {
     private authService: AuthService
 
   ) { }
+
+  @Public()
   @HttpCode(HttpStatus.OK)
   @Post("signin")
   async signIn(
@@ -23,21 +26,22 @@ export class AuthController {
     return { data: accessToken }
   }
 
+  @Public()
   @HttpCode(HttpStatus.OK)
   @Post("signup")
   async signUp(
-    @Body() { email, password }: AuthCredintialDto): Promise<IResponse<string>> {
-    const { accessToken } = await this.userService.createUser({ email, password })
+    @Body() { email, password, role }: AuthCredintialDto): Promise<IResponse<string>> {
+    const { accessToken } = await this.userService.createUser({ email, password, role })
     return { data: accessToken }
   }
 
-  @UseGuards(JwtAuthGuard)
   @Get('profile')
+  @Policy('product', 'create')
   getUserData(@Request() req): IResponse<AuthCredintialDto> {
 
     console.log(req.user.email)
     const data = req.user.email
-    return { data: { email: req.user.email, password: req.user.password } }
+    return { data: { email: req.user.email, password: req.user.password, role: req.user.role } }
   }
 
 }
