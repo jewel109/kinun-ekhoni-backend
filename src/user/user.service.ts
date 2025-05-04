@@ -19,7 +19,7 @@ export class UserService {
     return this.usersRepository.find()
   }
 
-  async createUser({ email, password }: AuthCredintialDto): Promise<{ accessToken: string }> {
+  async createUser({ email, password, role }: AuthCredintialDto): Promise<{ accessToken: string }> {
     if (await this.usersRepository.findOne({ where: { email } })) {
       throw new ConflictException("User already present in DB")
     }
@@ -29,7 +29,7 @@ export class UserService {
 
     this.usersRepository.save(newUser)
 
-    const payload = { email, password }
+    const payload = { email, password, role }
 
     return { accessToken: this.jwtService.sign(payload) }
   }

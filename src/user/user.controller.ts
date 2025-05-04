@@ -1,9 +1,8 @@
-import { Body, Controller, Get, NotFoundException, Post } from '@nestjs/common';
-import { UserService } from './user.service';
-import { User } from './user.entity';
-import { IResponse } from 'src/success.interceptor';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { AuthCredintialDto } from 'src/auth/authcredintialDto';
+import { IResponse } from 'src/success.interceptor';
 import { Public } from 'src/utils/public.decorator';
+import { UserService } from './user.service';
 
 @Controller('user')
 export class UserController {
