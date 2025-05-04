@@ -4,6 +4,6 @@ import { IResponse } from './success.interceptor';
 @Injectable()
 export class AppService {
   getHello(): IResponse<{}> {
-    return { data: "hei" };
+    return { data: "hello world" };
   }
 }
