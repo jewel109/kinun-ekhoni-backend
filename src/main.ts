@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { CatchEverythingFilter } from './error.interceptor';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule,);
   app.useGlobalPipes(new ValidationPipe());
   const configService = app.get(ConfigService);
   const port = configService.get('PORT');
