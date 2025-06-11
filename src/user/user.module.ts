@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -13,7 +13,8 @@ import { AuthModule } from 'src/auth/auth.module';
     secret: secrets.secret.toString(),
     signOptions: { expiresIn: '10d' }
   }),
-    AuthModule
+  forwardRef(() => AuthModule)
+
   ],
   providers: [UserService,],
   controllers: [UserController],
